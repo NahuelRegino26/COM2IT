@@ -5,8 +5,8 @@
 
 const CONFIG = {
   // Claves por defecto (reemplazables desde el panel de Ajustes en la PWA o directamente aquí)
-  SUPABASE_URL: window.localStorage.getItem('COM2IT_SUPABASE_URL') || 'https://tu-proyecto.supabase.co',
-  SUPABASE_ANON_KEY: window.localStorage.getItem('COM2IT_SUPABASE_ANON_KEY') || 'TU_SUPABASE_ANON_KEY',
+  SUPABASE_URL: window.localStorage.getItem('COM2IT_SUPABASE_URL') || 'https://kzajazriprbrvlvbykfi.supabase.co',
+  SUPABASE_ANON_KEY: window.localStorage.getItem('COM2IT_SUPABASE_ANON_KEY') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6YWphenJpcHJicnZsdmJ5a2ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzOTU0NDIsImV4cCI6MjEwODk3MTQ0Mn0.QyeIMBkcpj027YUtdlGqJ29rUun8YvfeL4f6HoYEipY',
   
   // Salas de informática centralizadas por el Piso Tecnológico
   SALAS: ['Sala 1', 'Sala 2', 'Sala 3', 'Piso Tecnológico'],
