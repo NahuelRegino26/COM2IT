@@ -83,3 +83,4 @@ BEGIN
         ALTER PUBLICATION supabase_realtime ADD TABLE public.reportes_incidencias;
     END IF;
 END $$;
+

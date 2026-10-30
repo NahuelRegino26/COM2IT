@@ -197,3 +197,4 @@ const DIAGNOSTICS = [
     resolutionTip: 'Si el jack de audio frontal está flojo o roto, prueba conectar directamente en el panel trasero.'
   }
 ];
+

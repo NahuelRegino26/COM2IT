@@ -47,3 +47,4 @@ const CONFIG = {
            !CONFIG.SUPABASE_ANON_KEY.includes('TU_SUPABASE_ANON_KEY');
   }
 };
+

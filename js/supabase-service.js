@@ -234,3 +234,4 @@ class SupabaseService {
 
 // Instancia global
 window.com2itService = new SupabaseService();
+
