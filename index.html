@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Com2IT - Asistente IT y Piso Tecnológico</title>
+  
+  <!-- Metadatos PWA -->
+  <meta name="description" content="Asistente IT y sistema de gestión de incidencias para las salas de informática y piso tecnológico del Colegio Comercio 2.">
+  <meta name="theme-color" content="#991B1B">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Com2IT">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Favicons e Iconos Institucionales -->
+  <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Supabase JS Client v2 (CDN Oficial) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- Encabezado Institucional -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-wrapper">
+        <img src="assets/icons/icon.svg" alt="Escudo Institucional Com2IT" class="brand-logo">
+        <div class="brand-titles">
+          <h1>Com2<span>IT</span></h1>
+          <p>Colegio Comercio 2 • Piso Tecnológico</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Indicador de Red / Conexión -->
+        <div id="networkStatusPill" class="status-pill online">
+          <span class="status-dot"></span>
+          <span id="networkStatusText">Online</span>
+        </div>
+
+        <!-- Botón de Instalación PWA (Aparece en navegadores compatibles) -->
+        <button id="btnInstallApp" class="btn-install" title="Instalar Com2IT en la PC o celular">
+          📲 <span>Instalar App</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Barra de Navegación por Pestañas -->
+  <nav class="app-nav">
+    <div class="nav-container">
+      <button class="nav-tab active" data-tab="tab-diagnostico">
+        🔍 <span>Diagnóstico PC</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-reportar">
+        📝 <span>Reportar Falla</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-piso-tecnologico">
+        📊 <span>Piso Tecnológico</span>
+        <span id="boardCountBadge" class="tab-badge">0</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-ajustes">
+        ⚙️ <span>Configuración</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Contenedor Principal -->
+  <main class="main-content">
+
+    <!-- Banner Informativo Común -->
+    <section class="hero-banner">
+      <h2>🛡️ Centro de Soporte para Salas de Informática</h2>
+      <p>
+        Herramienta de diagnóstico rápido y reporte de incidencias para estudiantes y profesores del Colegio Comercio 2. Todas las alertas se sincronizan en tiempo real con el <strong>Piso Tecnológico</strong>.
+      </p>
+      <div class="hero-salas">
+        <span class="sala-tag">🖥️ Sala 1 (Hardware & Ofimática)</span>
+        <span class="sala-tag">🌐 Sala 2 (Redes & Programación)</span>
+        <span class="sala-tag">⚙️ Sala 3 (Taller Técnico)</span>
+        <span class="sala-tag">📡 Piso Tecnológico Central</span>
+      </div>
+    </section>
+
+    <!-- ==============================================================
+         PESTAÑA 1: MÓDULO DE DIAGNÓSTICO (AUTOSERVICIO)
+         ============================================================== -->
+    <section id="tab-diagnostico" class="tab-pane active">
+      <div style="margin-bottom: 1.25rem;">
+        <h3 style="font-size: 1.2rem; color: #FFF; margin-bottom: 0.25rem;">¿Qué problema presenta la computadora?</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted);">
+          Selecciona una de las tarjetas a continuación para acceder a un paso a paso interactivo y resolver fallas comunes antes de iniciar la clase.
+        </p>
+      </div>
+
+      <!-- Cuadrícula interactiva de diagnóstico (cargada por JS) -->
+      <div id="diagnosticsGrid" class="diagnostics-grid"></div>
+    </section>
+
+    <!-- ==============================================================
+         PESTAÑA 2: MÓDULO DE REPORTE DE INCIDENCIAS
+         ============================================================== -->
+    <section id="tab-reportar" class="tab-pane">
+      <div class="form-card">
+        <div style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+          <h3 style="font-size: 1.25rem; color: var(--accent-gold-light); display: flex; align-items: center; gap: 0.5rem;">
+            📝 Reporte de Falla o Faltante al Piso Tecnológico
+          </h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
+            Envía los datos del equipo para que el equipo de soporte técnico acuda a la sala o prepare los repuestos necesarios.
+          </p>
+        </div>
+
+        <!-- Alerta de Respuesta -->
+        <div id="formAlert" class="alert-box"></div>
+
+        <form id="incidentForm">
+          <div class="form-grid">
+            <!-- Sala de Informática -->
+            <div class="form-group">
+              <label for="reportSala">Sala de Informática <span class="req">*</span></label>
+              <select id="reportSala" class="form-control" required></select>
+            </div>
+
+            <!-- Número de Equipo / Inventario -->
+            <div class="form-group">
+              <label for="reportNumeroEquipo">Número de Equipo / Puesto <span class="req">*</span></label>
+              <input type="text" id="reportNumeroEquipo" class="form-control" placeholder="Ej: PC-04, Puesto 12, Servidor Docente" required>
+            </div>
+
+            <!-- Tipo de Problema -->
+            <div class="form-group">
+              <label for="reportTipoProblema">Tipo de Problema o Faltante <span class="req">*</span></label>
+              <select id="reportTipoProblema" class="form-control" required></select>
+            </div>
+
+            <!-- Prioridad -->
+            <div class="form-group">
+              <label for="reportPrioridad">Nivel de Urgencia</label>
+              <select id="reportPrioridad" class="form-control">
+                <option value="Media">Media (Afecta parcialmente la clase)</option>
+                <option value="Alta">Alta (Equipo inutilizado / Falta de insumo)</option>
+                <option value="Urgente">Urgente (Afecta puesto docente o proyector)</option>
+                <option value="Baja">Baja (Detalle estético o no bloqueante)</option>
+              </select>
+            </div>
+
+            <!-- Nombre de quien reporta -->
+            <div class="form-group">
+              <label for="reportDocente">Reportado Por (Docente / Alumno)</label>
+              <input type="text" id="reportDocente" class="form-control" placeholder="Ej: Prof. García (Matemática) o Alumno">
+            </div>
+
+            <!-- Estado Inicial Fijo -->
+            <div class="form-group">
+              <label>Destino del Ticket</label>
+              <input type="text" class="form-control" value="Piso Tecnológico (Central de Soporte)" disabled style="opacity: 0.7;">
+            </div>
+
+            <!-- Descripción o Detalles -->
+            <div class="form-group form-group-full">
+              <label for="reportDescripcion">Descripción o Notas Adicionales</label>
+              <textarea id="reportDescripcion" class="form-control" placeholder="Describe brevemente el síntoma (ej. 'La pantalla se apaga a los 5 minutos', 'Falta el cable de alimentación', 'No hay señal en la boca de red de la pared')"></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="reset" class="btn-secondary">Limpiar Formulario</button>
+            <button type="submit" id="btnSubmitReport" class="btn-submit">
+              📤 Enviar Reporte al Piso Tecnológico
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ==============================================================
+         PESTAÑA 3: TABLERO EN VIVO DEL PISO TECNOLÓGICO
+         ============================================================== -->
+    <section id="tab-piso-tecnologico" class="tab-pane">
+      <div class="board-header">
+        <div>
+          <h3 style="font-size: 1.25rem; color: #FFF; margin-bottom: 0.2rem;">
+            📊 Tablero de Incidencias en Vivo
+          </h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">
+            Monitoreo en tiempo real de los reportes enviados desde las tres salas hacia el Piso Tecnológico.
+          </p>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <button id="btnRefreshBoard" class="btn-secondary" style="padding: 0.45rem 0.85rem;" title="Recargar incidencias">
+            🔄 Actualizar
+          </button>
+        </div>
+      </div>
+
+      <!-- Filtros por Sala -->
+      <div class="filter-bar" id="boardFilters" style="margin-bottom: 1.25rem;">
+        <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Filtrar por:</span>
+        <button class="filter-btn active" data-sala="Todas">Todas las Salas</button>
+        <button class="filter-btn" data-sala="Sala 1">Sala 1</button>
+        <button class="filter-btn" data-sala="Sala 2">Sala 2</button>
+        <button class="filter-btn" data-sala="Sala 3">Sala 3</button>
+        <button class="filter-btn" data-sala="Piso Tecnológico">Piso Tecnológico</button>
+      </div>
+
+      <!-- Listado dinámico de reportes -->
+      <div id="reportsListContainer" class="reports-list"></div>
+    </section>
+
+    <!-- ==============================================================
+         PESTAÑA 4: CONFIGURACIÓN Y CONEXIÓN SUPABASE
+         ============================================================== -->
+    <section id="tab-ajustes" class="tab-pane">
+      <div class="settings-section">
+        <h3>⚡ Conexión con Supabase (Piso Tecnológico)</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          Puedes vincular tu propio proyecto de Supabase ingresando las credenciales de la API. Se guardarán de forma segura en este navegador mediante <code>localStorage</code>.
+        </p>
+
+        <div id="settingsAlert" class="alert-box"></div>
+
+        <form id="settingsForm">
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label for="cfgSupabaseUrl">Supabase Project URL</label>
+            <input type="url" id="cfgSupabaseUrl" class="form-control" placeholder="https://tu-proyecto.supabase.co" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label for="cfgSupabaseKey">Supabase Public Anon Key</label>
+            <input type="text" id="cfgSupabaseKey" class="form-control" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6..." required>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <button type="submit" class="btn-submit" style="font-size: 0.85rem; padding: 0.65rem 1.25rem;">
+              💾 Guardar Credenciales
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="settings-section">
+        <h3>📋 Script SQL para Supabase</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">
+          Para habilitar la base de datos en Supabase, ejecuta el siguiente script en el <strong>SQL Editor</strong> de tu proyecto. También se encuentra disponible en el archivo <code>supabase_schema.sql</code> en el repositorio.
+        </p>
+        <div class="code-block">
+CREATE TABLE public.reportes_incidencias (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    sala TEXT NOT NULL,
+    numero_equipo TEXT NOT NULL,
+    tipo_problema TEXT NOT NULL,
+    prioridad TEXT DEFAULT 'Media',
+    reportado_por TEXT DEFAULT 'Docente / Alumno',
+    descripcion TEXT,
+    estado TEXT DEFAULT 'Pendiente'
+);
+ALTER TABLE public.reportes_incidencias ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Permitir registro publico" ON public.reportes_incidencias FOR INSERT WITH CHECK (true);
+CREATE POLICY "Permitir lectura publica" ON public.reportes_incidencias FOR SELECT USING (true);
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal Interactivo de Diagnóstico -->
+  <div id="diagModal" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="diagModalTitle">Diagnóstico de PC</h3>
+        <button id="btnCloseModal" class="btn-close-modal" aria-label="Cerrar modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p id="diagModalSubtitle" style="color: var(--text-muted); font-size: 0.9rem;"></p>
+        
+        <div id="diagModalSteps" class="steps-list"></div>
+
+        <div id="diagModalTip" class="resolution-tip-box"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btnDismissModal" class="btn-secondary">
+          ✓ Se resolvió el problema
+        </button>
+        <button id="btnModalReport" class="btn-primary-report">
+          ⚠️ ¿No se solucionó? Reportar al Piso Tecnológico &rarr;
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pie de Página Institucional -->
+  <footer class="app-footer">
+    <p>
+      Com2IT • PWA de Soporte Técnico Escolar • <span class="gold">Colegio Comercio 2</span> • Piso Tecnológico Centralizado
+    </p>
+  </footer>
+
+  <!-- Scripts Modulares -->
+  <script src="js/config.js"></script>
+  <script src="js/diagnostic-data.js"></script>
+  <script src="js/supabase-service.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

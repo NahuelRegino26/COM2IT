@@ -1,0 +1,48 @@
+{
+  "name": "Com2IT - Asistente y Piso Tecnológico",
+  "short_name": "Com2IT",
+  "description": "Asistente IT y sistema de gestión de incidencias para las salas de informática y piso tecnológico del Colegio Comercio 2.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0F172A",
+  "theme_color": "#991B1B",
+  "categories": ["education", "utilities", "productivity"],
+  "icons": [
+    {
+      "src": "assets/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nuevo Reporte",
+      "short_name": "Reportar",
+      "description": "Reportar una falla de equipo al Piso Tecnológico",
+      "url": "./index.html#reportar",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Diagnóstico Rápido",
+      "short_name": "Diagnóstico",
+      "description": "Guía interactiva para solucionar problemas comunes de PC",
+      "url": "./index.html#diagnostico",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
