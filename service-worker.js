@@ -1,4 +1,4 @@
-const CACHE_NAME = 'com2it-pwa-v1';
+const CACHE_NAME = 'com2it-pwa-v2';
 
 const STATIC_ASSETS = [
   './',
@@ -34,13 +34,15 @@ self.addEventListener('activate', (event) => {
             console.log('[Service Worker] Limpiando caché antigua:', name);
             return caches.delete(name);
           }
+          return Promise.resolve();
         })
       );
     }).then(() => self.clients.claim())
   );
 });
 
-// Estrategia de Fetch: Network-First con fallback a Caché para assets estáticos, ignorando llamadas directas a Supabase API
+// Estrategia de Fetch: Network-First con fallback a Caché.
+// Se ignoran las llamadas directas a la API REST/Realtime de Supabase.
 self.addEventListener('fetch', (event) => {
   const requestUrl = new URL(event.request.url);
 
@@ -49,12 +51,15 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Peticiones de recursos locales
+  // Solo se interceptan peticiones GET; el resto pasa directo a la red
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
-        // Si la respuesta es válida, clonamos y actualizamos la caché
-        if (networkResponse && networkResponse.status === 200 && event.request.method === 'GET') {
+        if (networkResponse && networkResponse.status === 200) {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseToCache);
@@ -71,51 +76,10 @@ self.addEventListener('fetch', (event) => {
 
         // Si es navegación HTML y falló, servir index.html
         if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
-
-        return new Response('Sin conexión de red en Com2IT', {
-          status: 503,
-          statusText: 'Offline',
-          headers: new Headers({ 'Content-Type': 'text/plain; charset=utf-8' })
-        });
-      })
-  );
-});
-
-
-// Estrategia de Fetch: Network-First con fallback a Caché para assets estáticos, ignorando llamadas directas a Supabase API
-self.addEventListener('fetch', (event) => {
-  const requestUrl = new URL(event.request.url);
-
-  // No interceptar peticiones a la API REST o Realtime de Supabase
-  if (requestUrl.hostname.includes('supabase.co')) {
-    return;
-  }
-
-  // Peticiones de recursos locales
-  event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        // Si la respuesta es válida, clonamos y actualizamos la caché
-        if (networkResponse && networkResponse.status === 200 && event.request.method === 'GET') {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-        }
-        return networkResponse;
-      })
-      .catch(async () => {
-        // Si no hay red (offline), servimos desde la caché
-        const cachedResponse = await caches.match(event.request);
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-
-        // Si es navegación HTML y falló, servir index.html
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
+          const fallbackPage = await caches.match('./index.html');
+          if (fallbackPage) {
+            return fallbackPage;
+          }
         }
 
         return new Response('Sin conexión de red en Com2IT', {

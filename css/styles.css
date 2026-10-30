@@ -402,6 +402,12 @@ body {
   box-shadow: var(--shadow-lg);
 }
 
+.action-card:focus-visible {
+  outline: 3px solid var(--accent-gold);
+  outline-offset: 3px;
+  background: var(--bg-card-hover);
+}
+
 .action-card.card-diag:hover {
   border-color: rgba(56, 189, 248, 0.5);
   box-shadow: 0 12px 28px rgba(56, 189, 248, 0.15);
@@ -917,6 +923,39 @@ body {
 
 .sala-info-banner strong {
   color: var(--accent-gold-light);
+}
+
+.sala-info-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.sala-info-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.sala-info-desc {
+  font-size: 0.86rem;
+  color: #CBD5E1;
+}
+
+.sala-info-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.15rem;
+}
+
+.sala-equip-chip {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid var(--border-gold);
+  color: var(--accent-gold-light);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-full);
 }
 
 .form-grid {

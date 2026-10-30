@@ -127,14 +127,19 @@ function initNavigation() {
     });
   });
 
-  // Escuchar enlaces hash
-  if (window.location.hash === '#diagnostico') {
-    switchTab('tab-diagnostico');
-  } else if (window.location.hash === '#reportar') {
-    switchTab('tab-reportar');
-  } else if (window.location.hash === '#tablero') {
-    switchTab('tab-piso-tecnologico');
+  // Resolver la vista inicial a partir del hash (soporte de shortcuts PWA)
+  function applyHashRoute() {
+    const hashRoutes = {
+      '#diagnostico': 'tab-diagnostico',
+      '#reportar': 'tab-reportar',
+      '#tablero': 'tab-piso-tecnologico'
+    };
+    const target = hashRoutes[window.location.hash];
+    if (target) switchTab(target);
   }
+
+  applyHashRoute();
+  window.addEventListener('hashchange', applyHashRoute);
 
   window.com2itSwitchTab = switchTab;
 }
@@ -146,19 +151,22 @@ function initLandingPageActions() {
   const btnGoDiag = document.getElementById('btnActionDiagnostico');
   const btnGoReport = document.getElementById('btnActionReportar');
 
-  if (btnGoDiag) {
-    btnGoDiag.addEventListener('click', (e) => {
+  // Las tarjetas de acceso son divs con role="button": se habilita teclado (Enter/Espacio)
+  function bindActionCard(card, targetTab) {
+    if (!card) return;
+
+    const activate = (e) => {
+      if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
       e.preventDefault();
-      window.com2itSwitchTab('tab-diagnostico');
-    });
+      window.com2itSwitchTab(targetTab);
+    };
+
+    card.addEventListener('click', activate);
+    card.addEventListener('keydown', activate);
   }
 
-  if (btnGoReport) {
-    btnGoReport.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.com2itSwitchTab('tab-reportar');
-    });
-  }
+  bindActionCard(btnGoDiag, 'tab-diagnostico');
+  bindActionCard(btnGoReport, 'tab-reportar');
 
   // Botones directos desde las tarjetas de sala en la Landing
   document.querySelectorAll('[data-landing-sala]').forEach(btn => {
@@ -384,23 +392,20 @@ function updateSalaEquipmentBanner(salaKey) {
   const banner = document.getElementById('salaEquipBanner');
   const info = CONFIG.INFO_SALAS ? CONFIG.INFO_SALAS[salaKey] : null;
 
-  if (banner && info) {
-    let iconExtra = '';
-    if (info.tiene3D && info.tieneTV) {
-      iconExtra = '🖨️ Impresoras 3D y 📺 Smart TV';
-    } else if (info.tieneTV) {
-      iconExtra = '📺 Smart TV para presentaciones';
-    } else {
-      iconExtra = '🖥️ Computadoras de escritorio y red por cable';
-    }
+  if (!banner || !info) return;
 
-    banner.innerHTML = `
-      <div style="font-size: 1.3rem;">ℹ️</div>
-      <div>
-        <strong>${info.nombre}:</strong> ${info.descripcion}
-      </div>
-    `;
-  }
+  const chips = (info.equiposDisponibles || [])
+    .map(eq => `<span class="sala-equip-chip">${eq}</span>`)
+    .join('');
+
+  banner.innerHTML = `
+    <div class="sala-info-icon">ℹ️</div>
+    <div class="sala-info-body">
+      <strong>${info.nombre}</strong>
+      <span class="sala-info-desc">${info.descripcion}</span>
+      <div class="sala-info-chips">${chips}</div>
+    </div>
+  `;
 }
 
 /* -------------------------------------------------------------
