@@ -1,105 +1,93 @@
-# Com2IT - Asistente IT y Gestión de Piso Tecnológico
+# Com2IT - Asistente IT y Piso Tecnológico (Colegio Comercio N°2)
 
-**Com2IT** es una Progressive Web App (PWA) diseñada para el soporte, diagnóstico y gestión de incidencias técnicas en las salas de informática y piso tecnológico del **Colegio Comercio 2**.
+**Com2IT** es una Progressive Web App (PWA) de soporte, diagnóstico y gestión de incidencias técnicas en las salas de informática, vinculada en tiempo real al **Piso Tecnológico** del **Colegio Comercio N°2 (La Rioja)**.
 
 ---
 
-## 🚀 Características Principales
+## 🌟 Nueva Arquitectura y Flujo de Usuario (Landing Page)
 
-1. **Identidad Visual & PWA:**
-   - Inspirada en los colores institucionales (Rojo `#991B1B` y Amarillo/Oro `#F59E0B`) con un diseño moderno de escudo, engranajes y monitores en estilo Dark Tech.
-   - Totalmente instalable en Windows, Linux, Android e iOS en modo *Standalone*.
-   - Funcionamiento sin conexión a red (Offline) con Service Worker y cola local de incidencias (`localStorage`).
+La aplicación cuenta con una **Landing Page inicial** limpia, moderna e intuitiva:
 
-2. **Módulo 1: Diagnóstico Guiado de Autoservicio:**
-   - Asistente interactivo para alumnos y profesores con pasos prácticos para resolver fallas cotidianas:
-     - *La PC no enciende / Problemas eléctricos y zapatillas.*
-     - *No aparece imagen / Monitor en negro o sin señal.*
-     - *Sin conexión a Internet / Conectores RJ45 y rosetas.*
-     - *PC congelada o con lentitud extrema.*
-     - *Periféricos faltantes o sin respuesta (Teclado / Mouse).*
-     - *Fallas de Audio / Salida en jack verde.*
-   - Botón directo de derivación hacia el Piso Tecnológico si el problema no se resuelve.
+1. **Pantalla de Inicio (Landing Page):**
+   - Presentación institucional amigable para docentes de todas las áreas (historia, matemática, lengua, etc.) y alumnos.
+   - **Botón de Acceso Directo 1: 🛠️ Diagnóstico Rápido de PC:** Pasos claros y sencillos de autoservicio para resolver problemas frecuentes en el aula (la PC no enciende, no da imagen, no conecta a Internet, o está congelada).
+   - **Botón de Acceso Directo 2: 📝 Reportar Falla o Faltante:** Notificación rápida hacia el Piso Tecnológico.
+   - **Tarjetas de Salas de Informática:**
+     - **Sala 1:** PCs de escritorio, red escolar, Impresoras 3D y Smart TV.
+     - **Sala 2:** PCs de escritorio y red escolar.
+     - **Sala 3:** PCs de escritorio, red escolar y Smart TV.
 
-3. **Módulo 2: Reporte de Incidencias hacia el Piso Tecnológico:**
-   - Formulario estructurado para reportar equipos afectados:
-     - Selección de sala (**Sala 1**, **Sala 2**, **Sala 3**, **Piso Tecnológico**).
-     - Identificador de equipo / inventario (ej. `PC-04`, `Puesto Docente`).
-     - Tipo de problema o faltante.
-     - Nivel de prioridad (Baja, Media, Alta, Urgente).
-     - Datos de emisor y notas adicionales.
+2. **Formulario de Reporte Simplificado:**
+   - Selección de sala (**Sala 1**, **Sala 2**, **Sala 3**).
+   - Banner contextual dinámico que indica qué equipamiento posee la sala seleccionada.
+   - Selector / píldoras rápidas para equipo o periférico (PC, Teclado, Mouse, Monitor, Smart TV, Impresora 3D, Cable de red).
+   - Integración invisible con Supabase (el docente no debe configurar URLs ni API Keys).
 
-4. **Módulo 3: Tablero en Vivo & Conexión con Supabase:**
-   - Almacenamiento centralizado en la nube mediante PostgreSQL en **Supabase** (`reportes_incidencias`).
-   - Sincronización en tiempo real (*Realtime*) y fallback automático offline.
-   - Filtros de consulta inmediata por sala.
+3. **PWA Standalone & Offline First:**
+   - Instalable en Windows, Android o iOS (`manifest.json`).
+   - `service-worker.js` garantiza funcionamiento sin conexión a red y almacenamiento de reportes en cola local (`localStorage`) que se sincronizan solos al reconectar.
+
+4. **Monitoreo en Tiempo Real (Piso Tecnológico):**
+   - Base de datos en PostgreSQL mediante **Supabase** (`reportes_incidencias`).
+   - Tablero en vivo con filtros por sala y estado de atención (Pendiente, En revisión, Resuelto).
 
 ---
 
 ## 📁 Estructura del Proyecto
 
-```
+```text
 App-Demo/
-├── .gitignore                    # Reglas de exclusión para Git
-├── AGENT.md                      # Directrices del agente en Antigravity
-├── README.md                     # Documentación general del proyecto
-├── index.html                    # Interfaz principal de la PWA
-├── manifest.json                 # Web App Manifest (PWA)
+├── index.html                    # Landing Page institucional y vistas SPA
+├── manifest.json                 # Web App Manifest PWA (modo standalone)
 ├── service-worker.js             # Service Worker con caché offline
-├── supabase_schema.sql           # Script SQL para crear las tablas en Supabase
-├── icon-192.png                  # Icono PWA 192x192
-├── icon-512.png                  # Icono PWA 512x512
+├── supabase_schema.sql           # Script SQL para tablas, RLS e índices en Supabase
+├── README.md                     # Documentación general
 ├── assets/
 │   └── icons/
-│       ├── icon.svg              # Escudo institucional vectorial
-│       ├── icon-192.png
-│       └── icon-512.png
+│       ├── icon.svg              # Escudo institucional vectorial Comercio N°2
+│       ├── icon-192.png          # Icono PWA 192x192
+│       ├── icon-512.png          # Icono PWA 512x512
+│       └── logo-original.jpg     # Logo original institucional
 ├── css/
-│   └── styles.css                # Paleta institucional, variables y responsive design
+│   └── styles.css                # Estilos Landing Page, componentes y responsive
 └── js/
-    ├── config.js                 # Constantes de configuración y credenciales Supabase
-    ├── diagnostic-data.js        # Casos y pasos guiados de diagnóstico
-    ├── supabase-service.js       # Capa de datos (Supabase + Cola offline)
-    └── app.js                    # Controlador general de interfaz y eventos
+    ├── config.js                 # Salas, catálogo de fallas y credenciales fijas
+    ├── diagnostic-data.js        # Casos guiados de diagnóstico rápido
+    ├── supabase-service.js       # Conexión Supabase y cola offline
+    └── app.js                    # Controlador de vistas, eventos y navegación
 ```
 
 ---
 
-## 🗄️ Configuración de la Base de Datos (Supabase)
+## 🗄️ Esquema de Base de Datos (Supabase)
 
-1. Ingresa a tu panel en [supabase.com](https://supabase.com).
-2. Ve a la sección **SQL Editor** y ejecuta el contenido del archivo `supabase_schema.sql`.
-3. Obtén tu **Project URL** y tu **anon key** en *Project Settings* -> *API*.
-4. Abre la PWA, ve a la pestaña **⚙️ Configuración** e introduce las credenciales (o edita directamente `js/config.js`).
+```sql
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
----
+CREATE TABLE IF NOT EXISTS public.reportes_incidencias (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    sala TEXT NOT NULL CHECK (sala IN ('Sala 1', 'Sala 2', 'Sala 3', 'Piso Tecnológico', 'Otra')),
+    numero_equipo TEXT NOT NULL,
+    tipo_problema TEXT NOT NULL,
+    prioridad TEXT NOT NULL DEFAULT 'Media',
+    reportado_por TEXT NOT NULL DEFAULT 'Docente a cargo',
+    descripcion TEXT,
+    estado TEXT NOT NULL DEFAULT 'Pendiente' CHECK (estado IN ('Pendiente', 'En revisión', 'Resuelto', 'Descartado')),
+    tecnico_asignado TEXT,
+    notas_resolucion TEXT
+);
 
-## 💻 Ejecución Local
-
-Para probar la PWA con soporte completo de Service Worker, sirve los archivos con cualquier servidor HTTP local:
-
-```bash
-# Con Node.js (npx)
-npx serve .
-
-# O con Python (si estuviera disponible)
-python -m http.server 8080
+ALTER TABLE public.reportes_incidencias ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Permitir registro de incidencias publico" ON public.reportes_incidencias FOR INSERT WITH CHECK (true);
+CREATE POLICY "Permitir lectura de incidencias" ON public.reportes_incidencias FOR SELECT USING (true);
+CREATE POLICY "Permitir actualizacion de incidencias" ON public.reportes_incidencias FOR UPDATE USING (true);
 ```
 
 ---
 
-## 🐙 Control de Versiones con Git y GitHub
+## 🐙 Repositorio Oficial en GitHub
 
-Para subir el proyecto a un repositorio en GitHub:
-
-```bash
-# 1. Enlazar con tu repositorio remoto en GitHub
-git remote add origin https://github.com/TU-USUARIO/TU-REPOSITORIO.git
-
-# 2. Asegurar la rama principal
-git branch -M main
-
-# 3. Subir los cambios a GitHub
-git push -u origin main
-```
-
+- **URL:** [https://github.com/NahuelRegino26/COM2IT](https://github.com/NahuelRegino26/COM2IT)
+- **Rama:** `main`

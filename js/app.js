@@ -1,7 +1,7 @@
 /**
  * Com2IT - Controlador Principal de la Aplicación PWA
- * Gestiona navegación de pestañas, diagnóstico interactivo,
- * formulario de incidencias hacia el Piso Tecnológico y eventos PWA.
+ * Gestiona navegación por Landing Page, diagnóstico interactivo,
+ * formulario simplificado para docentes hacia el Piso Tecnológico y eventos PWA.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -11,10 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // 2. Inicialización de la Interfaz
   initPWAInstallPrompt();
   initNavigation();
+  initLandingPageActions();
   initDiagnosticsModule();
   initReportForm();
   initLiveBoard();
-  initSettingsModule();
   initNetworkStatus();
 });
 
@@ -68,7 +68,7 @@ function initNetworkStatus() {
     if (statusPill && statusText) {
       if (isOnline) {
         statusPill.className = 'status-pill online';
-        statusText.textContent = CONFIG.isConfigured() ? 'Piso Tech Conectado' : 'Online (Local)';
+        statusText.textContent = 'Piso Tech Conectado';
       } else {
         statusPill.className = 'status-pill offline';
         statusText.textContent = 'Modo Offline';
@@ -82,11 +82,12 @@ function initNetworkStatus() {
 }
 
 /* -------------------------------------------------------------
- * 2. Navegación por Pestañas
+ * 2. Navegación por Pestañas y Enlaces Directos
  * ----------------------------------------------------------- */
 function initNavigation() {
   const tabs = document.querySelectorAll('.nav-tab');
   const panes = document.querySelectorAll('.tab-pane');
+  const brandLink = document.getElementById('brandHomeLink');
 
   function switchTab(targetId) {
     tabs.forEach(t => t.classList.remove('active'));
@@ -95,10 +96,10 @@ function initNavigation() {
     const activeTab = document.querySelector(`.nav-tab[data-tab="${targetId}"]`);
     const activePane = document.getElementById(targetId);
 
-    if (activeTab && activePane) {
-      activeTab.classList.add('active');
-      activePane.classList.add('active');
-    }
+    if (activeTab) activeTab.classList.add('active');
+    if (activePane) activePane.classList.add('active');
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     if (targetId === 'tab-piso-tecnologico') {
       loadBoardReports();
@@ -112,8 +113,24 @@ function initNavigation() {
     });
   });
 
-  // Escuchar links o hash (#reportar, #diagnostico)
-  if (window.location.hash === '#reportar') {
+  if (brandLink) {
+    brandLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchTab('tab-inicio');
+    });
+  }
+
+  // Botones de "Volver al Inicio"
+  document.querySelectorAll('.btn-back-home').forEach(btn => {
+    btn.addEventListener('click', () => {
+      switchTab('tab-inicio');
+    });
+  });
+
+  // Escuchar enlaces hash
+  if (window.location.hash === '#diagnostico') {
+    switchTab('tab-diagnostico');
+  } else if (window.location.hash === '#reportar') {
     switchTab('tab-reportar');
   } else if (window.location.hash === '#tablero') {
     switchTab('tab-piso-tecnologico');
@@ -123,7 +140,43 @@ function initNavigation() {
 }
 
 /* -------------------------------------------------------------
- * 3. Módulo 1: Diagnóstico Interactivo de Autoservicio
+ * 3. Acciones de la Landing Page Inicial
+ * ----------------------------------------------------------- */
+function initLandingPageActions() {
+  const btnGoDiag = document.getElementById('btnActionDiagnostico');
+  const btnGoReport = document.getElementById('btnActionReportar');
+
+  if (btnGoDiag) {
+    btnGoDiag.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.com2itSwitchTab('tab-diagnostico');
+    });
+  }
+
+  if (btnGoReport) {
+    btnGoReport.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.com2itSwitchTab('tab-reportar');
+    });
+  }
+
+  // Botones directos desde las tarjetas de sala en la Landing
+  document.querySelectorAll('[data-landing-sala]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetSala = btn.getAttribute('data-landing-sala');
+      const selectSala = document.getElementById('reportSala');
+      if (selectSala && targetSala) {
+        selectSala.value = targetSala;
+        updateSalaEquipmentBanner(targetSala);
+      }
+      window.com2itSwitchTab('tab-reportar');
+    });
+  });
+}
+
+/* -------------------------------------------------------------
+ * 4. Módulo 1: Diagnóstico Rápido de Autoservicio
  * ----------------------------------------------------------- */
 function initDiagnosticsModule() {
   const grid = document.getElementById('diagnosticsGrid');
@@ -152,12 +205,11 @@ function initDiagnosticsModule() {
       </div>
       <p class="diag-desc">${item.subtitle}</p>
       <div class="diag-action-text">
-        <span>Comenzar diagnóstico guiado</span> &rarr;
+        <span>Revisar pasos de solución</span> &rarr;
       </div>
     </div>
   `).join('');
 
-  // Evento al pulsar una tarjeta
   grid.addEventListener('click', (e) => {
     const card = e.target.closest('.diag-card');
     if (!card) return;
@@ -184,7 +236,7 @@ function initDiagnosticsModule() {
       </div>
     `).join('');
 
-    modalTip.innerHTML = `<strong>Consejo técnico:</strong> ${diag.resolutionTip}`;
+    modalTip.innerHTML = `<strong>Consejo práctico:</strong> ${diag.resolutionTip}`;
     modal.classList.add('open');
   }
 
@@ -196,7 +248,7 @@ function initDiagnosticsModule() {
   if (btnCloseModal) btnCloseModal.addEventListener('click', closeDiagModal);
   if (btnDismissModal) btnDismissModal.addEventListener('click', closeDiagModal);
 
-  // Botón directo a reporte si no se soluciona
+  // Botón directo a reporte si la falla persiste
   if (btnModalReport) {
     btnModalReport.addEventListener('click', () => {
       if (currentSelectedDiag) {
@@ -222,12 +274,12 @@ function prefillReportFromDiagnostic(diag) {
   }
 
   if (txtDesc) {
-    txtDesc.value = `Se completaron los pasos guiados de diagnóstico para "${diag.title}". La falla persiste y requiere intervención técnica en el puesto.`;
+    txtDesc.value = `Se realizaron los pasos de diagnóstico guiado para "${diag.title}". El inconveniente persiste y requiere intervención en el aula.`;
   }
 }
 
 /* -------------------------------------------------------------
- * 4. Módulo 2: Registro y Envío de Reportes
+ * 5. Módulo 2: Formulario de Reporte Simplificado
  * ----------------------------------------------------------- */
 function initReportForm() {
   const form = document.getElementById('incidentForm');
@@ -235,15 +287,32 @@ function initReportForm() {
   const btnSubmit = document.getElementById('btnSubmitReport');
   const selectSala = document.getElementById('reportSala');
   const selectProblema = document.getElementById('reportTipoProblema');
+  const inputEquipo = document.getElementById('reportNumeroEquipo');
+  const quickPillsContainer = document.getElementById('quickPillsContainer');
 
-  // Llenar opciones de salas desde CONFIG
+  // Llenar opciones de salas (Sala 1, Sala 2, Sala 3)
   if (selectSala && CONFIG.SALAS) {
     selectSala.innerHTML = CONFIG.SALAS.map(s => `<option value="${s}">${s}</option>`).join('');
+    updateSalaEquipmentBanner(selectSala.value);
+
+    selectSala.addEventListener('change', (e) => {
+      updateSalaEquipmentBanner(e.target.value);
+    });
   }
 
-  // Llenar categorías de problemas desde CONFIG
+  // Llenar categorías de problemas
   if (selectProblema && CONFIG.CATEGORIAS_PROBLEMAS) {
     selectProblema.innerHTML = CONFIG.CATEGORIAS_PROBLEMAS.map(c => `<option value="${c.label}">${c.label}</option>`).join('');
+  }
+
+  // Píldoras rápidas para autocompletar el equipo afectado
+  if (quickPillsContainer && inputEquipo) {
+    quickPillsContainer.addEventListener('click', (e) => {
+      const pill = e.target.closest('.quick-pick-pill');
+      if (!pill) return;
+      inputEquipo.value = pill.getAttribute('data-val');
+      inputEquipo.focus();
+    });
   }
 
   if (!form) return;
@@ -251,15 +320,14 @@ function initReportForm() {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const sala = document.getElementById('reportSala').value;
-    const numero_equipo = document.getElementById('reportNumeroEquipo').value.trim();
-    const tipo_problema = document.getElementById('reportTipoProblema').value;
-    const prioridad = document.getElementById('reportPrioridad').value;
-    const reportado_por = document.getElementById('reportDocente').value.trim() || 'Docente / Alumno';
-    const descripcion = document.getElementById('reportDescripcion').value.trim();
+    const sala = selectSala ? selectSala.value : 'Sala 1';
+    const equipo_o_periferico = inputEquipo ? inputEquipo.value.trim() : '';
+    const tipo_problema = selectProblema ? selectProblema.value : '';
+    const reportado_por = (document.getElementById('reportDocente')?.value || '').trim() || 'Docente a cargo';
+    const descripcion = (document.getElementById('reportDescripcion')?.value || '').trim();
 
-    if (!sala || !numero_equipo || !tipo_problema) {
-      showAlert(alertBox, 'error', 'Por favor completa los campos obligatorios: Sala, Número de Equipo y Tipo de Problema.');
+    if (!sala || !equipo_o_periferico || !tipo_problema) {
+      showAlert(alertBox, 'error', 'Por favor selecciona la Sala e indica qué equipo o periférico presenta la falla.');
       return;
     }
 
@@ -269,9 +337,9 @@ function initReportForm() {
     try {
       const payload = {
         sala,
-        numero_equipo,
+        equipo_o_periferico,
         tipo_problema,
-        prioridad,
+        prioridad: 'Media',
         reportado_por,
         descripcion
       };
@@ -280,14 +348,18 @@ function initReportForm() {
 
       if (result.success) {
         form.reset();
+        // Restaurar sala por defecto y banner
+        if (selectSala) {
+          selectSala.value = 'Sala 1';
+          updateSalaEquipmentBanner('Sala 1');
+        }
         showAlert(alertBox, result.offline ? 'warning' : 'success', result.message);
-        // Actualizar el contador de la pestaña tablero
         loadBoardReports();
       } else {
-        showAlert(alertBox, 'error', 'No se pudo registrar la incidencia. Intenta nuevamente.');
+        showAlert(alertBox, 'error', 'No se pudo enviar el reporte. Por favor intenta nuevamente.');
       }
     } catch (err) {
-      console.error('Error al registrar incidencia:', err);
+      console.error('Error al registrar reporte:', err);
       showAlert(alertBox, 'error', 'Error al procesar el reporte: ' + err.message);
     } finally {
       btnSubmit.disabled = false;
@@ -301,12 +373,38 @@ function initReportForm() {
     element.innerHTML = `<span>${type === 'success' ? '✓' : type === 'warning' ? '⚠️' : '✕'}</span> <div>${text}</div>`;
     setTimeout(() => {
       element.classList.remove('show');
-    }, 8000);
+    }, 7000);
+  }
+}
+
+/**
+ * Actualiza el banner contextual de la sala seleccionada
+ */
+function updateSalaEquipmentBanner(salaKey) {
+  const banner = document.getElementById('salaEquipBanner');
+  const info = CONFIG.INFO_SALAS ? CONFIG.INFO_SALAS[salaKey] : null;
+
+  if (banner && info) {
+    let iconExtra = '';
+    if (info.tiene3D && info.tieneTV) {
+      iconExtra = '🖨️ Impresoras 3D y 📺 Smart TV';
+    } else if (info.tieneTV) {
+      iconExtra = '📺 Smart TV para presentaciones';
+    } else {
+      iconExtra = '🖥️ Computadoras de escritorio y red por cable';
+    }
+
+    banner.innerHTML = `
+      <div style="font-size: 1.3rem;">ℹ️</div>
+      <div>
+        <strong>${info.nombre}:</strong> ${info.descripcion}
+      </div>
+    `;
   }
 }
 
 /* -------------------------------------------------------------
- * 5. Módulo 3: Tablero en Vivo del Piso Tecnológico
+ * 6. Módulo 3: Tablero en Vivo de Incidencias
  * ----------------------------------------------------------- */
 let currentSalaFilter = 'Todas';
 
@@ -331,12 +429,10 @@ function initLiveBoard() {
     });
   }
 
-  // Escuchar evento de sincronización offline
   window.addEventListener('com2it:synced', () => {
     loadBoardReports();
   });
 
-  // Suscribir a Realtime de Supabase
   if (window.com2itService) {
     window.com2itService.subscribeToRealtime(() => {
       loadBoardReports();
@@ -349,7 +445,7 @@ async function loadBoardReports() {
   const counterBadge = document.getElementById('boardCountBadge');
   if (!container) return;
 
-  container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 2rem;">Cargando incidencias del Piso Tecnológico...</div>';
+  container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 2rem;">Consultando estado de incidencias...</div>';
 
   try {
     const reports = await window.com2itService.getRecentReports(currentSalaFilter);
@@ -362,34 +458,34 @@ async function loadBoardReports() {
       container.innerHTML = `
         <div style="text-align: center; color: var(--text-dim); padding: 2.5rem; background: var(--bg-card); border-radius: var(--radius-md);">
           <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🎉</div>
-          <h4 style="color: var(--text-muted); margin-bottom: 0.25rem;">No hay incidencias pendientes</h4>
-          <p style="font-size: 0.85rem;">Todos los equipos de la sala seleccionada están operativos.</p>
+          <h4 style="color: var(--text-muted); margin-bottom: 0.25rem;">Sin incidencias pendientes</h4>
+          <p style="font-size: 0.85rem;">Todos los equipos de la sala seleccionada están en orden.</p>
         </div>
       `;
       return;
     }
 
     container.innerHTML = reports.map(r => {
-      const dateFormatted = new Date(r.created_at).toLocaleString('es-AR', {
+      const dateFormatted = new Date(r.created_at || r.fecha_creacion).toLocaleString('es-AR', {
         dateStyle: 'short',
         timeStyle: 'short'
       });
 
       const isOfflineItem = r._offline;
-      const estadoClass = r.estado.replace(/\s+/g, '_');
+      const equipoNombre = r.equipo_o_periferico || r.numero_equipo || 'Equipo';
+      const estadoClass = (r.estado || 'Pendiente').replace(/\s+/g, '_');
 
       return `
         <div class="report-item">
           <div class="report-top">
             <div class="report-meta">
               <span class="badge-sala">${r.sala}</span>
-              <span class="badge-equipo">${r.numero_equipo}</span>
-              <span class="badge-prioridad ${r.prioridad || 'Media'}">${r.prioridad || 'Media'}</span>
-              ${isOfflineItem ? '<span style="font-size:0.7rem; background:#451A03; color:#FCD34D; padding:0.15rem 0.4rem; border-radius:4px;">En cola offline</span>' : ''}
+              <span class="badge-equipo">${escapeHtml(equipoNombre)}</span>
+              ${isOfflineItem ? '<span style="font-size:0.7rem; background:#451A03; color:#FCD34D; padding:0.15rem 0.4rem; border-radius:4px;">Guardado local</span>' : ''}
             </div>
-            <span class="badge-estado ${estadoClass}" data-state="${r.estado}">${r.estado}</span>
+            <span class="badge-estado ${estadoClass}" data-state="${r.estado}">${r.estado || 'Pendiente'}</span>
           </div>
-          <div class="report-problem-title">${r.tipo_problema}</div>
+          <div class="report-problem-title">${escapeHtml(r.tipo_problema)}</div>
           ${r.descripcion ? `<div class="report-desc-text">${escapeHtml(r.descripcion)}</div>` : ''}
           <div class="report-footer">
             <span>Reportado por: <strong>${escapeHtml(r.reportado_por || 'Docente')}</strong></span>
@@ -402,7 +498,7 @@ async function loadBoardReports() {
     console.error('Error al cargar reportes:', err);
     container.innerHTML = `
       <div style="color: var(--danger); text-align: center; padding: 1.5rem;">
-        No se pudieron cargar los reportes en este momento. Revisa la conexión o las claves de Supabase.
+        No se pudieron consultar las incidencias en este momento.
       </div>
     `;
   }
@@ -416,37 +512,3 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
-
-/* -------------------------------------------------------------
- * 6. Módulo 4: Ajustes y Conexión Supabase
- * ----------------------------------------------------------- */
-function initSettingsModule() {
-  const formSettings = document.getElementById('settingsForm');
-  const inputUrl = document.getElementById('cfgSupabaseUrl');
-  const inputKey = document.getElementById('cfgSupabaseKey');
-  const alertSettings = document.getElementById('settingsAlert');
-
-  if (inputUrl) inputUrl.value = CONFIG.SUPABASE_URL || '';
-  if (inputKey) inputKey.value = CONFIG.SUPABASE_ANON_KEY || '';
-
-  if (formSettings) {
-    formSettings.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const url = inputUrl.value.trim();
-      const key = inputKey.value.trim();
-
-      CONFIG.saveCredentials(url, key);
-      window.com2itService.init();
-
-      if (alertSettings) {
-        alertSettings.className = 'alert-box show success';
-        alertSettings.innerHTML = '<span>✓</span> Configuración guardada correctamente en el dispositivo.';
-        setTimeout(() => alertSettings.classList.remove('show'), 4000);
-      }
-
-      initNetworkStatus();
-      loadBoardReports();
-    });
-  }
-}
-

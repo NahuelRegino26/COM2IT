@@ -1,6 +1,6 @@
 /**
- * Com2IT - Banco de Diagnóstico Interactivo de Autoservicio
- * Casos comunes de soporte en las salas de informática y piso tecnológico.
+ * Com2IT - Banco de Diagnóstico Rápido de Autoservicio
+ * Casos comunes para docentes y alumnos en las salas de informática del Colegio Comercio N°2.
  */
 
 const DIAGNOSTICS = [
@@ -9,192 +9,202 @@ const DIAGNOSTICS = [
     title: 'La PC no enciende',
     subtitle: 'El gabinete no emite luces, ventiladores ni ruidos al presionar el botón de encendido.',
     icon: '⚡',
-    badge: 'Hardware Eléctrico',
-    recommendedIssue: 'La PC no enciende / Sin energía',
+    badge: 'Energía & Gabinete',
+    recommendedIssue: 'La PC no enciende / Sin corriente eléctrica',
     steps: [
       {
         step: 1,
-        title: 'Verificar la zapatilla o prolongador',
-        detail: 'Comprueba si la zapatilla bajo el banco tiene la luz roja encendida. En muchas aulas, las zapatillas se apagan accidentalmente con los pies de los estudiantes o tras una bajada de tensión.',
-        actionCheck: '¿La tecla de la zapatilla está en posición "I" (Encendido)?'
+        title: 'Verificar la zapatilla o prolongador del banco',
+        detail: 'Comprueba que la zapatilla bajo el banco tenga la luz roja encendida. En el aula suelen apagarse sin querer con los pies o tras un corte de luz.',
+        actionCheck: '¿La tecla roja de la zapatilla está en "I" (Encendido)?'
       },
       {
         step: 2,
-        title: 'Comprobar el cable de poder (Interlock)',
-        detail: 'Revisa el cable negro grueso conectado detrás de la fuente de poder del gabinete. Empújalo firmemente hacia adentro; suele aflojarse al correr las mesas.',
-        actionCheck: '¿El cable de poder está firmemente calzado en la fuente?'
+        title: 'Comprobar el cable de alimentación negro (Interlock)',
+        detail: 'Revisa el cable negro grueso detrás del gabinete. Empújalo firmemente hacia adentro; suele aflojarse al mover las mesas o sillas.',
+        actionCheck: '¿El cable de poder está bien encastrado en la fuente?'
       },
       {
         step: 3,
-        title: 'Verificar la llave trasera de la fuente',
-        detail: 'Muchos gabinetes tienen un interruptor I/O en la parte trasera de la fuente de poder. Asegúrate de que esté en "I" y no en "O".',
-        actionCheck: '¿El interruptor trasero de la fuente está en posición "I"?'
+        title: 'Revisar la llave trasera de la fuente',
+        detail: 'En la parte posterior de la CPU suele haber una teclita pequeña I/O. Debe estar presionada en "I".',
+        actionCheck: '¿El interruptor trasero de la CPU está en "I"?'
       },
       {
         step: 4,
-        title: 'Probar en otra toma del banco',
-        detail: 'Conecta el cable en otra boca de la misma zapatilla o en el enchufe del puesto contiguo para descartar una toma falseada.',
+        title: 'Probar en otra toma de corriente',
+        detail: 'Enchufa el cable en otra boca de la misma zapatilla o en el puesto vecino para descartar un tomacorriente falseado.',
         actionCheck: '¿Sigue sin encender en otra toma probada?'
       }
     ],
-    resolutionTip: 'Si tras estos pasos no hay ninguna luz ni sonido de ventilador, es probable que la fuente de poder esté averiada o el botón frontal esté desconectado.'
+    resolutionTip: 'Si tras estos pasos no hay luces ni ventiladores, la fuente de poder puede estar dañada y el equipo del Piso Tecnológico la reemplazará.'
   },
   {
     id: 'video',
     title: 'No aparece imagen / Monitor en negro',
-    subtitle: 'La PC enciende (hace ruido y luces), pero la pantalla no muestra nada o dice "Sin Señal".',
+    subtitle: 'La PC hace ruido de encendida, pero la pantalla no muestra nada o dice "Sin Señal".',
     icon: '🖥️',
-    badge: 'Video & Pantalla',
-    recommendedIssue: 'No aparece imagen / Monitor en negro',
+    badge: 'Pantalla & Monitor',
+    recommendedIssue: 'No da imagen / Pantalla en negro o sin señal',
     steps: [
       {
         step: 1,
-        title: 'Comprobar el LED del monitor',
-        detail: 'Fíjate en el botón del monitor. Si la luz está apagada, presiona el botón Power del monitor. Si está naranja o parpadea en azul, el monitor recibe corriente pero no detecta señal de video.',
-        actionCheck: '¿El monitor tiene su LED de encendido activo?'
+        title: 'Comprobar la luz del monitor',
+        detail: 'Mira el borde inferior del monitor. Si la luz está apagada, presiona el botón Power. Si está titilando o en color ámbar, el monitor está prendido pero no recibe imagen.',
+        actionCheck: '¿El monitor tiene la luz de encendido encendida?'
       },
       {
         step: 2,
-        title: 'Ajustar el cable de video (VGA / HDMI)',
-        detail: 'En las salas escolares el cable azul (VGA) o negro (HDMI) suele tirarse. Desenróscalo suavemente, vuelve a insertarlo derecho y aprieta las dos tuercas plásticas laterales con la mano.',
-        actionCheck: '¿El cable está ajustado tanto en la PC como en la pantalla?'
+        title: 'Ajustar el cable de video (azul VGA o negro HDMI)',
+        detail: 'Es muy común que el cable de video se afloje. Aprieta suavemente los tornillitos plásticos con los dedos tanto en el monitor como en la PC.',
+        actionCheck: '¿El cable de video está bien firme en ambos extremos?'
       },
       {
         step: 3,
-        title: 'Verificar si la PC tiene placa de video dedicada',
-        detail: 'Si la PC tiene conectores de video abajo (placa PCIe) y también arriba (en la placa madre), el cable DEBE conectarse en la placa de abajo.',
-        actionCheck: '¿Está enchufado en la salida gráfica correcta?'
-      },
-      {
-        step: 4,
-        title: 'Atención a los pitidos (Beeps) del gabinete',
-        detail: 'Si al encender escuchas 3 o más pitidos largos/cortos seguidos, la memoria RAM o el procesador perdieron contacto debido al polvo o vibración.',
-        actionCheck: '¿Se escuchan pitidos al encender el equipo?'
+        title: 'Revisar la salida de video correcta',
+        detail: 'Si la PC tiene dos puertos de video (uno arriba y otro abajo), el cable siempre debe ir conectado en la placa gráfica inferior.',
+        actionCheck: '¿Está enchufado en el conector inferior si tiene dos?'
       }
     ],
-    resolutionTip: 'Si el monitor indica "Sin señal" y el cable está bien firme, se requiere que el Piso Tecnológico abra el gabinete para limpiar los contactos de la memoria RAM con goma de borrar.'
+    resolutionTip: 'Si el monitor dice "Sin señal" con los cables bien firmes, es probable que la memoria RAM necesite limpieza de contactos en el taller técnico.'
   },
   {
     id: 'network',
-    title: 'Sin conexión a Internet o Red',
-    subtitle: 'Aparece el icono del planeta/mundo con cruz o el aviso "Sin acceso a Internet".',
+    title: 'Sin Internet o Red escolar',
+    subtitle: 'Aparece el icono del mundo o un cartel de "Sin conexión a Internet".',
     icon: '🌐',
     badge: 'Conectividad & Red',
-    recommendedIssue: 'Sin conexión a Internet / Red escolar',
+    recommendedIssue: 'Sin conexión a Internet o Red escolar',
     steps: [
       {
         step: 1,
-        title: 'Inspeccionar el cable de red (RJ45)',
-        detail: 'Revisa el conector de red detrás del gabinete. Debe tener dos lucecitas (verde/ámbar). Una debe estar fija y la otra titilar. Si están apagadas, empuja la ficha hasta escuchar el "clic" de la traba plástica.',
-        actionCheck: '¿Parpadean las luces de red detrás de la computadora?'
+        title: 'Comprobar el cable de red (RJ45)',
+        detail: 'Revisa el cable detrás de la CPU. Debe tener una o dos lucecitas verdes o amarillas parpadeando. Empuja la ficha hasta escuchar el "clic" de la traba plástica.',
+        actionCheck: '¿Parpadean las luces del conector de red detrás de la PC?'
       },
       {
         step: 2,
-        title: 'Revisar la roseta de red en la pared/piso',
-        detail: 'Sigue el cable hasta la boca de pared (roseta) o el canalizador. Comprueba que el cable no esté doblado en 90 grados o desconectado de la pared.',
-        actionCheck: '¿El extremo de la pared está firme?'
+        title: 'Revisar la boca de red en la pared o canaleta',
+        detail: 'Sigue el cable hasta la roseta de la pared. Asegúrate de que no esté aplastado ni desconectado.',
+        actionCheck: '¿El extremo conectado a la pared está firme?'
       },
       {
         step: 3,
-        title: 'Comprobar si otras PCs de la misma sala tienen Internet',
-        detail: 'Pregúntale a los puestos vecinos. Si ninguna PC tiene internet, el problema está en el Switch del rack de la sala o en el enlace principal del Piso Tecnológico.',
-        actionCheck: '¿Es un problema solo de esta máquina o de toda la sala?'
-      },
-      {
-        step: 4,
-        title: 'Reiniciar la interfaz de red en Windows',
-        detail: 'Haz clic derecho en el icono de red de la barra de tareas y selecciona "Solucionar problemas" o desconecta el cable por 10 segundos y vuelve a conectarlo para renovar la IP por DHCP.',
-        actionCheck: '¿Se resolvió tras renovar la conexión?'
+        title: 'Consultar si las demás PCs tienen internet',
+        detail: 'Pregunta a los puestos contiguos. Si ninguna máquina tiene internet, el inconveniente es del Switch de la sala o el enlace central del Piso Tecnológico.',
+        actionCheck: '¿El problema afecta a una sola PC o a toda la sala?'
       }
     ],
-    resolutionTip: 'Si solo esa máquina no tiene red y las luces traseras están apagadas, probablemente la ficha RJ45 tenga un hilo cortado y requiera un re-crimpeado por el piso técnico.'
+    resolutionTip: 'Si solo esa PC no tiene red y las luces traseras están apagadas, la ficha del cable puede necesitar ser recrimpeada por los técnicos.'
   },
   {
     id: 'peripherals',
     title: 'Teclado o Mouse no responden / Faltantes',
-    subtitle: 'El cursor no se mueve o el teclado no escribe en las aplicaciones.',
+    subtitle: 'El cursor no se mueve en pantalla o las teclas no escriben.',
     icon: '🖱️',
-    badge: 'Periféricos',
-    recommendedIssue: 'Periférico faltante o dañado (Teclado/Mouse)',
+    badge: 'Teclado & Mouse',
+    recommendedIssue: 'Falta o no anda Teclado / Mouse',
     steps: [
       {
         step: 1,
-        title: 'Cambiar de puerto USB (Preferir puertos traseros)',
-        detail: 'Los puertos USB delanteros del gabinete suelen desgastarse o desconectarse internamente. Conecta el cable del mouse o teclado en los puertos USB soldados en la parte trasera del gabinete (directo al motherboard).',
-        actionCheck: '¿Probaste en los puertos USB posteriores?'
+        title: 'Cambiar a un puerto USB trasero',
+        detail: 'Los puertos USB del frente de la CPU suelen falsearse con el uso. Conecta el cable del teclado o mouse en los puertos USB soldados en la parte trasera del gabinete.',
+        actionCheck: '¿Probaste conectando en los puertos USB traseros?'
       },
       {
         step: 2,
-        title: 'Comprobar luces ópticas y de teclado',
-        detail: 'Levanta el mouse: ¿tiene luz roja/azul en la base? En el teclado, presiona la tecla "Bloq Mayús" (Caps Lock): ¿enciende el LED indicador verde?',
-        actionCheck: '¿Los indicadores lumínicos reaccionan?'
+        title: 'Comprobar luces del teclado y mouse',
+        detail: 'Levanta el mouse para ver si emite luz roja o azul. En el teclado, pulsa "Bloq Mayús" (Caps Lock) para comprobar si la lucecita verde responde.',
+        actionCheck: '¿Alguna luz del periférico reacciona?'
       },
       {
         step: 3,
-        title: 'Detectar faltantes en la sala',
-        detail: 'Si el equipo no tiene teclado, mouse o cable de corriente porque fue trasladado para una actividad, notifícalo con el formulario para reposición inmediata desde el pañol del Piso Tecnológico.',
-        actionCheck: '¿El periférico está físicamente ausente del puesto?'
+        title: 'Reportar faltante para reposición',
+        detail: 'Si en el puesto falta el mouse, teclado o pad porque fueron trasladados, genera el reporte para que el pañol del Piso Tecnológico traiga el repuesto.',
+        actionCheck: '¿El periférico no está en la sala?'
       }
     ],
-    resolutionTip: 'En caso de periféricos con cables pelados o fichas USB deformadas, reporta de inmediato para evitar cortocircuitos en la placa madre.'
+    resolutionTip: 'No fuerces los conectores USB. Si una ficha está rota o torcida, repórtalo para evitar dañar la placa madre.'
   },
   {
     id: 'performance',
-    title: 'PC congelada / Lentitud extrema',
-    subtitle: 'Windows no responde a clics, se queda cargando o el disco está al 100%.',
+    title: 'PC congelada o muy lenta',
+    subtitle: 'Windows no responde a clics, tarda minutos en abrir carpetas o el cursor gira sin parar.',
     icon: '⏳',
-    badge: 'Rendimiento & SO',
-    recommendedIssue: 'PC congelada / Lentitud extrema',
+    badge: 'Rendimiento',
+    recommendedIssue: 'La computadora se traba o anda muy lenta',
     steps: [
       {
         step: 1,
-        title: 'Combinación de teclas para Administrador de Tareas',
-        detail: 'Presiona Ctrl + Shift + Esc (o Ctrl + Alt + Supr). Si se abre la ventana, revisa qué programa está consumiendo 100% de CPU o Disco y finalízalo.',
-        actionCheck: '¿Pudiste abrir el Administrador de Tareas?'
+        title: 'Cerrar pestañas pesadas o programas en segundo plano',
+        detail: 'Tener decenas de videos o pestañas abiertas en el navegador satura la memoria RAM. Cierra lo que no estés usando.',
+        actionCheck: '¿Mejoró la velocidad al cerrar ventanas innecesarias?'
       },
       {
         step: 2,
-        title: 'Cerrar pestañas pesadas del navegador',
-        detail: 'Plataformas interactivas, emuladores y múltiples videos abiertos simultáneamente consumen toda la memoria RAM en equipos de 4GB u 8GB.',
-        actionCheck: '¿Se normalizó al cerrar el navegador?'
-      },
-      {
-        step: 3,
-        title: 'Reinicio limpio del sistema',
-        detail: 'Si el mouse aún responde, ve al menú Inicio -> Apagar -> Reiniciar. Si está completamente congelada, mantén presionado el botón de encendido del gabinete por 8 segundos hasta que se apague y vuelve a encender.',
-        actionCheck: '¿La PC recuperó velocidad luego del reinicio?'
+        title: 'Reinicio limpio del equipo',
+        detail: 'Ve a Inicio -> Apagar -> Reiniciar. Si la pantalla no responde en absoluto, mantén presionado el botón de encendido de la CPU durante 8 segundos hasta que se apague y vuelve a encender.',
+        actionCheck: '¿El equipo respondió tras el reinicio?'
       }
     ],
-    resolutionTip: 'Si tras reiniciar el equipo sigue demorando más de 10 minutos en arrancar, el disco duro puede tener sectores defectuosos o el perfil de usuario estar corrupto.'
+    resolutionTip: 'Si tras reiniciar la máquina sigue demorando más de 10 minutos en responder, puede tratarse de un problema en el disco o perfil de usuario.'
   },
   {
-    id: 'audio',
-    title: 'Sin Audio / Parlantes o Auriculares',
-    subtitle: 'No se escucha sonido en videos, llamadas o software educativo.',
-    icon: '🎧',
-    badge: 'Multimedia',
-    recommendedIssue: 'Sin Audio / Parlantes o Jack dañado',
+    id: 'tv',
+    title: 'Smart TV sin señal o pantalla apagada (Sala 1 y 3)',
+    subtitle: 'La televisión de la sala no muestra la presentación o no recibe señal de la PC docente.',
+    icon: '📺',
+    badge: 'Smart TV & Pantalla',
+    recommendedIssue: 'Falla o sin señal en Smart TV',
     steps: [
       {
         step: 1,
-        title: 'Verificar el conector Jack de 3.5mm (Verde)',
-        detail: 'En las PC de escritorio escolares, el auricular o parlante debe conectarse en el conector circular de color VERDE (salida de audio), no en el rosa (micrófono) ni azul (línea).',
-        actionCheck: '¿La ficha está colocada en el jack verde?'
+        title: 'Verificar la fuente de entrada (Input / Source)',
+        detail: 'Con el control remoto o los botones laterales del TV, presiona "Source" o "Input" y selecciona HDMI 1 o HDMI 2 según donde esté conectado el cable.',
+        actionCheck: '¿La entrada seleccionada en la TV coincide con el puerto del cable HDMI?'
       },
       {
         step: 2,
-        title: 'Seleccionar el dispositivo de salida correcto en Windows',
-        detail: 'Haz clic en el parlantito junto a la hora. Pulsa sobre el nombre del dispositivo y asegúrate de elegir "Altavoces / Realtek Audio" en lugar de la salida del monitor si este no posee parlantes.',
-        actionCheck: '¿El dispositivo predeterminado coincide con tu auricular?'
+        title: 'Configurar duplicación en la computadora',
+        detail: 'En el teclado de la PC docente presiona la tecla Windows + P y selecciona la opción "Duplicar" para clonar la pantalla en la TV.',
+        actionCheck: '¿Pudiste activar la opción "Duplicar" en Windows?'
       },
       {
         step: 3,
-        title: 'Comprobar la perilla o rueda del propio auricular',
-        detail: 'Muchos auriculares para clase tienen una ruedita o switch de silencio (Mute) en el mismo cable que suele estar al mínimo sin notarlo.',
-        actionCheck: '¿El potenciómetro del cable está al máximo?'
+        title: 'Ajustar el cable HDMI en la PC y en la TV',
+        detail: 'Asegúrate de que el conector plano HDMI esté bien encajado en ambos extremos sin doblarse.',
+        actionCheck: '¿El cable HDMI está bien insertado?'
       }
     ],
-    resolutionTip: 'Si el jack de audio frontal está flojo o roto, prueba conectar directamente en el panel trasero.'
+    resolutionTip: 'Si el control no responde o la TV no enciende, repórtalo para cambio de pilas o verificación del prolongador.'
+  },
+  {
+    id: 'impresora3d',
+    title: 'Impresora 3D atascada o sin calentar (Sala 1)',
+    subtitle: 'La impresora 3D no inicia la impresión, la boquilla no calienta o el filamento patina.',
+    icon: '🖨️',
+    badge: 'Taller 3D (Sala 1)',
+    recommendedIssue: 'Falla en Impresora 3D (atasco, filamento o calibración)',
+    steps: [
+      {
+        step: 1,
+        title: 'Comprobar temperatura de boquilla y cama',
+        detail: 'En la pantalla de la impresora verifica si la boquilla alcanza los 200°C y la cama los 60°C para PLA.',
+        actionCheck: '¿La temperatura en pantalla sube normalmente?'
+      },
+      {
+        step: 2,
+        title: 'Verificar el carrete de filamento',
+        detail: 'Asegúrate de que el rollo gire libremente y el filamento no esté cruzado o estrangulado en el soporte.',
+        actionCheck: '¿El filamento corre sin trabarse hacia el extrusor?'
+      },
+      {
+        step: 3,
+        title: 'No forzar la nivelación manual',
+        detail: 'Si la primera capa raspa el vidrio o no se adhiere, detén la impresión desde la perilla (Stop/Pause) para no rayar la cama.',
+        actionCheck: '¿Se detuvo la impresión a tiempo?'
+      }
+    ],
+    resolutionTip: 'Para desatascos internos o cambios de boquilla (nozzle), solicita la asistencia directa de los técnicos del pañol.'
   }
 ];
-

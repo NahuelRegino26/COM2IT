@@ -16,13 +16,13 @@ class SupabaseService {
     if (CONFIG.isConfigured() && window.supabase) {
       try {
         this.client = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
-        console.log('[SupabaseService] Cliente Supabase inicializado correctamente.');
+        console.log('[SupabaseService] Cliente Supabase inicializado correctamente hacia Piso Tecnológico.');
       } catch (err) {
         console.warn('[SupabaseService] Error al inicializar cliente Supabase:', err);
         this.client = null;
       }
     } else {
-      console.log('[SupabaseService] Modo demostración / sin credenciales activas. Operando con almacenamiento local.');
+      console.log('[SupabaseService] Operando con respaldo local.');
       this.client = null;
     }
   }
@@ -74,14 +74,16 @@ class SupabaseService {
    * Registra un nuevo reporte hacia Supabase (o a cola offline)
    */
   async createReport(reportData) {
+    const equipo = reportData.equipo_o_periferico || reportData.numero_equipo || 'Equipo sin especificar';
+
     // Si no hay cliente Supabase o estamos offline, guardar localmente
     if (!this.client || !navigator.onLine) {
-      const local = this.saveOfflineReport(reportData);
+      const local = this.saveOfflineReport({ ...reportData, numero_equipo: equipo });
       return {
         success: true,
         offline: true,
         data: local,
-        message: 'Reporte guardado localmente en la PWA. Se enviará al Piso Tecnológico en cuanto haya red o se configuren las credenciales.'
+        message: 'El reporte se guardó en el dispositivo. Se enviará al Piso Tecnológico en cuanto se recupere la conexión.'
       };
     }
 
@@ -91,10 +93,10 @@ class SupabaseService {
         .insert([
           {
             sala: reportData.sala,
-            numero_equipo: reportData.numero_equipo,
+            numero_equipo: equipo,
             tipo_problema: reportData.tipo_problema,
             prioridad: reportData.prioridad || 'Media',
-            reportado_por: reportData.reportado_por || 'Docente / Alumno',
+            reportado_por: reportData.reportado_por || 'Docente a cargo',
             descripcion: reportData.descripcion || '',
             estado: 'Pendiente'
           }
@@ -110,18 +112,18 @@ class SupabaseService {
         success: true,
         offline: false,
         data: data,
-        message: '¡Reporte enviado exitosamente al Piso Tecnológico!'
+        message: '¡El reporte fue recibido por el Piso Tecnológico! Un técnico revisará la incidencia.'
       };
     } catch (err) {
       console.error('[SupabaseService] Error al enviar reporte a Supabase:', err);
       // Fallback a cola offline
-      const local = this.saveOfflineReport(reportData);
+      const local = this.saveOfflineReport({ ...reportData, numero_equipo: equipo });
       return {
         success: true,
         offline: true,
         fallback: true,
         data: local,
-        message: 'Hubo una dificultad en la red con el servidor. El reporte se guardó en el dispositivo y se sincronizará automáticamente.'
+        message: 'No hubo respuesta inmediata del servidor. El reporte quedó guardado y se sincronizará automáticamente.'
       };
     }
   }
@@ -139,7 +141,7 @@ class SupabaseService {
           .from('reportes_incidencias')
           .select('*')
           .order('created_at', { ascending: false })
-          .limit(20);
+          .limit(25);
 
         if (filterSala && filterSala !== 'Todas') {
           query = query.eq('sala', filterSala);
@@ -160,7 +162,6 @@ class SupabaseService {
       filteredLocals = localReports.filter(r => r.sala === filterSala);
     }
 
-    // Combinar (locales primero para visualización inmediata)
     return [...filteredLocals, ...cloudReports];
   }
 
@@ -173,7 +174,7 @@ class SupabaseService {
     const locals = this.getOfflineReports();
     if (locals.length === 0) return;
 
-    console.log(`[SupabaseService] Intentando sincronizar ${locals.length} reportes offline...`);
+    console.log(`[SupabaseService] Sincronizando ${locals.length} reportes offline...`);
     const successfulIds = [];
 
     for (const report of locals) {
@@ -183,11 +184,11 @@ class SupabaseService {
           .insert([
             {
               sala: report.sala,
-              numero_equipo: report.numero_equipo,
+              numero_equipo: report.equipo_o_periferico || report.numero_equipo,
               tipo_problema: report.tipo_problema,
-              prioridad: report.prioridad,
-              reportado_por: report.reportado_por,
-              descripcion: report.descripcion,
+              prioridad: report.prioridad || 'Media',
+              reportado_por: report.reportado_por || 'Docente a cargo',
+              descripcion: report.descripcion || '',
               estado: 'Pendiente'
             }
           ]);
@@ -203,7 +204,7 @@ class SupabaseService {
     if (successfulIds.length > 0) {
       const remaining = locals.filter(r => !successfulIds.includes(r.id));
       localStorage.setItem('com2it_offline_reports', JSON.stringify(remaining));
-      console.log(`[SupabaseService] Sincronizados exitosamente ${successfulIds.length} reportes.`);
+      console.log(`[SupabaseService] Sincronizados ${successfulIds.length} reportes.`);
       window.dispatchEvent(new CustomEvent('com2it:synced', { detail: { count: successfulIds.length } }));
     }
   }
@@ -218,7 +219,6 @@ class SupabaseService {
       this.realtimeChannel = this.client
         .channel('public:reportes_incidencias')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'reportes_incidencias' }, payload => {
-          console.log('[Supabase Realtime] Cambio detectado:', payload);
           if (typeof callback === 'function') {
             callback(payload);
           }
@@ -226,7 +226,7 @@ class SupabaseService {
         .subscribe();
       return this.realtimeChannel;
     } catch (e) {
-      console.warn('Realtime no soportado o no disponible:', e);
+      console.warn('Realtime no soportado:', e);
       return null;
     }
   }
@@ -234,4 +234,3 @@ class SupabaseService {
 
 // Instancia global
 window.com2itService = new SupabaseService();
-
